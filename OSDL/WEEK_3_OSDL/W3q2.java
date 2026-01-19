@@ -1,8 +1,8 @@
 package WEEK_3_OSDL;
 
 public class W3q2 {
-    public static void main(String[] args) {
-        // Simulate orders for Customer 101 and 102
+    public static void main(String[] args) {    
+        
         Thread order101Validation = new OrderTask(101, "Validation");
         Thread order101Payment = new OrderTask(101, "Payment");
         Thread order101Shipment = new OrderTask(101, "Shipment");
@@ -29,7 +29,7 @@ public class W3q2 {
             e.printStackTrace();
         }
 
-        System.out.println("All orders have been processed successfully!");
+        System.out.println("All orders have been processed!");
     }
 }
 
@@ -63,3 +63,4 @@ class OrderTask extends Thread {
         System.out.println(taskType + " completed for Order " + orderId);
     }
 }
+
