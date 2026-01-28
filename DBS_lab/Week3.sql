@@ -121,6 +121,15 @@ Einstein
 
 --11. Find the departments that have the highest average salary.
 
+SQL> select d.dept_name from department d join instructor i using (dept_name) group by dept_name having
+ avg(i.salary) >= all (select avg(salary) from instructor join department using (dept_name) group by dept_name);
++-----------+
+| dept_name |
++-----------+
+| Physics   |
++-----------+
+1 row in set (0.00 sec)
+
 --12. Find the names of those departments whose budget is lesser than the average salary of all instructors.
 
 SQL> SELECT dept_name
@@ -165,6 +174,8 @@ SQL> SELECT course_id
   4  GROUP BY course_id
   5  HAVING COUNT(*) <= 1;
 
+SQL> select s.course_id from section s where s.year = 2009 and (select count(*) from section c where c.course_id=s.course_id and c.year=2009) <=1;
+
 COURSE_I
 --------
 BIO-101
@@ -174,3 +185,55 @@ EE-181
 PHY-101
 
 --15. Find all the students who have opted at least two courses offered by CSE department.
+
+SELECT s.name
+FROM student s
+WHERE (
+    SELECT COUNT(*)
+    FROM takes t
+    JOIN course c ON t.course_id = c.course_id
+    WHERE t.id = s.id
+      AND c.dept_name = 'CSE'
+) >= 2;
+
+-- 16.
+
+SELECT t.ID, s.name
+FROM takes t
+JOIN course c ON t.course_id = c.course_id
+JOIN student s ON s.id = t.ID
+WHERE c.dept_name = 'Biology'
+GROUP BY t.ID, s.name
+HAVING COUNT(DISTINCT t.course_id) = (
+    SELECT COUNT(*)
+    FROM course
+    WHERE dept_name = 'BIO'
+);
+
+--17 
+
+SELECT dept_name, AVG(salary) AS avg_salary
+FROM instructor
+GROUP BY dept_name
+HAVING AVG(salary) > 42000;
+
+--18
+
+CREATE VIEW all_courses AS
+SELECT 
+    s.course_id,
+    s.sec_id,
+    s.semester,
+    s.year,
+    s.building,
+    s.room_number
+FROM section s
+JOIN course c ON s.course_id = c.course_id
+WHERE c.dept_name = 'PHY'
+  AND s.semester = 'Fall'
+  AND s.year = 2009;
+
+
+SELECT *
+FROM all_courses;
+
