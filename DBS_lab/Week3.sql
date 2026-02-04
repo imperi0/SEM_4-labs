@@ -193,31 +193,50 @@ WHERE (
     FROM takes t
     JOIN course c ON t.course_id = c.course_id
     WHERE t.id = s.id
-      AND c.dept_name = 'CSE'
+    AND c.dept_name = 'Comp. Sci.'
 ) >= 2;
 
--- 16.
++----------+
+| name     |
++----------+
+| Zhang    |
+| Shankar  |
+| Levy     |
+| Williams |
+| Brown    |
+| Bourikas |
++----------+
+6 rows in set (0.00 sec)
 
-SELECT t.ID, s.name
-FROM takes t
-JOIN course c ON t.course_id = c.course_id
-JOIN student s ON s.id = t.ID
-WHERE c.dept_name = 'Biology'
-GROUP BY t.ID, s.name
-HAVING COUNT(DISTINCT t.course_id) = (
-    SELECT COUNT(*)
-    FROM course
-    WHERE dept_name = 'BIO'
-);
+-- 16.Find all the students who have opted at least two courses offered by CSE department.
 
---17 
+SQL> SELECT s.id, s.name
+    -> FROM student s
+    -> JOIN takes t ON s.id = t.id
+    -> JOIN course c ON t.course_id = c.course_id
+    -> WHERE c.dept_name = 'Comp. Sci.'
+    -> GROUP BY s.id, s.name
+    -> HAVING COUNT(DISTINCT t.course_id) >= 2;
++-------+----------+
+| id    | name     |
++-------+----------+
+| 00128 | Zhang    |
+| 12345 | Shankar  |
+| 45678 | Levy     |
+| 54321 | Williams |
+| 76543 | Brown    |
+| 98765 | Bourikas |
++-------+----------+
+6 rows in set (0.00 sec)
+
+--17. Find the average instructors salary of those departments where the average salary is greater than 42000 
 
 SELECT dept_name, AVG(salary) AS avg_salary
 FROM instructor
 GROUP BY dept_name
 HAVING AVG(salary) > 42000;
 
---18
+--18. Create a view all_courses consisting of course sections offered by Physics department in the Fall 2009, with the building and room number of each section.
 
 CREATE VIEW all_courses AS
 SELECT 
@@ -229,11 +248,38 @@ SELECT
     s.room_number
 FROM section s
 JOIN course c ON s.course_id = c.course_id
-WHERE c.dept_name = 'PHY'
+WHERE c.dept_name = 'Physics'
   AND s.semester = 'Fall'
   AND s.year = 2009;
 
+-- 19. Select all the courses from all_courses view.
+  
+SQL> select * from all_courses;
++-----------+--------+----------+------+----------+-------------+
+| course_id | sec_id | semester | year | building | room_number |
++-----------+--------+----------+------+----------+-------------+
+| PHY-101   | 1      | Fall     | 2009 | Watson   | 100         |
++-----------+--------+----------+------+----------+-------------+
+1 row in set (0.00 sec)
 
-SELECT *
-FROM all_courses;
+-- 20. Create a view department_total_salary consisting of department name and total salary of that department.
 
+SQL> CREATE VIEW department_total_salary AS
+    -> SELECT dept_name, SUM(salary) AS total_salary
+    -> FROM instructor
+    -> GROUP BY dept_name;
+Query OK, 0 rows affected (0.01 sec)
+
+SQL> SELECT * FROM department_total_salary;
++------------+--------------+
+| dept_name  | total_salary |
++------------+--------------+
+| Biology    |     72000.00 |
+| Comp. Sci. |    232000.00 |
+| Elec. Eng. |     80000.00 |
+| Finance    |    170000.00 |
+| History    |    122000.00 |
+| Music      |     40000.00 |
+| Physics    |    182000.00 |
++------------+--------------+
+7 rows in set (0.00 sec)
