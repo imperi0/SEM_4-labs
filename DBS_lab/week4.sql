@@ -270,8 +270,27 @@ SQL> WITH dept_total AS (
 
 -- 15. Transfer all the students from CSE department to IT department.
 
+SAVEPOINT sp_transfer;
+
+UPDATE student
+SET dept_name = 'IT'
+WHERE dept_name = 'Comp. Sci.';
+
+ROLLBACK TO sp_transfer;
 
 -- 16. Increase salaries of instructors whose salary is over $100,000 by 3%, and all others receive a 5% raise
+
+SAVEPOINT sp_salary;
+
+UPDATE instructor
+SET salary = salary * 1.03
+WHERE salary > 100000;
+
+UPDATE instructor
+SET salary = salary * 1.05
+WHERE salary <= 100000;
+
+ROLLBACK TO sp_salary;
 
 -- ADDITIONAL EXERCISE:
 -- 1. Display lowest paid instructor details under each department.
@@ -335,3 +354,4 @@ SQL> SELECT dept_name
     -> GROUP BY dept_name
     -> HAVING AVG(student_count) > 10;
 Empty set (0.01 sec)
+
